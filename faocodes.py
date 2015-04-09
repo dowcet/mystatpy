@@ -1,12 +1,11 @@
-# Main routine asks user for a search string, then prints a list of FAOSTAT country and/or item codes.
+# Main routine asks user for a search string, then prints a list of FAOSTAT country and/or item codes for any matches.
 #
 # data is read from members.json, which can be downloaded directly at: 
 # http://data.fao.org/developers/api/v1/en/resources/members.json?page=1&pageSize=1000&fields=mnemonic%2Clabel%40en%2Cproperties.*
 #
-# Search is case insensitive. The detailed "description" property is included in the search, so expect a few extra, unexpected results 
+# Search is case insensitive. The detailed "description" property is included in the search, so unexpected results are common. 
 
 import json
-
 
 def FaostatGetDictionary():
     # loads the main dictionary from members.json
