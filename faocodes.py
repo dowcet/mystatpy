@@ -43,13 +43,18 @@ if __name__ == '__main__':
     code_list = sorted(code_list)
     print ""
     for result in code_list:
-        if len(result[0]) < 7:
-            print result[0],"\t", "\t", "\t", "\t", "\t", result[1]
-        elif len(result[0]) < 15:
-            print result[0],"\t", "\t", "\t", "\t", result[1]
-        elif len(result[0]) < 23:
-            print result[0],"\t", "\t", "\t", result[1]
-        elif len(result[0]) < 30:
-            print result[0],"\t", "\t", result[1]
+        label = result[0]
+        label = label.replace("&amp;", "&")
+        label = label.replace("&apos;", "'")
+        code = str(result[1])
+        if len(label) < 8:
+            output_line = label+"\t------------------------------- "+code
+        elif len(label) < 16:
+            output_line =  label+"\t----------------------- "+code
+        elif len(label) < 24:
+            output_line =  label+"\t--------------- "+code
+        elif len(label) < 32:
+            output_line =  label+"\t\t"+code
         else:
-            print result[0],"\t", result[1]
+            output_line = label+"\t"+code
+        print output_line
