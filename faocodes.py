@@ -6,13 +6,18 @@
 # Search is case insensitive. The detailed "description" property is included in the search, so unexpected results are common.
 # 
 
-import json
+import os, json, urllib
+
+# this __location__ trick is from http://stackoverflow.com/questions/4060221/how-to-reliably-open-a-file-in-the-same-directory-as-a-python-script
+
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 def FaostatGetDictionary():
     # loads the main dictionary from members.json
     prop_dict = {}
     temp_list = []
-    with open("members.json", 'r') as data_file:
+    with open((os.path.join(__location__, "members.json")), 'r') as data_file:
         raw_data = json.load(data_file)    
     for item in raw_data["result"]["list"]["items"]:
         prop_dict[item["label"]] = item["properties"]
