@@ -1,0 +1,5 @@
+This will be a collection of Python functions for working with statistical data. 
+
+_faocodes.py_:  Gets FAOSTAT country and item codes for requesting data.
+
+
