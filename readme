@@ -1,5 +1,5 @@
-This will be a collection of Python functions for working with statistical data. 
+This is a collection of Python functions for working with statistical data. I am a novice coder, learning as I go.
 
-_faocodes.py_:  Gets FAOSTAT country and item codes for requesting data.
+_faocodes.py_:  Gets FAOSTAT country and item codes, to help with requesting data.
 
-
+_firstchart.py_: Loads a huge FAOSTAT dataset into a smaller file and plots a simple chart, mainly as a personal learning excercise for myself. 
