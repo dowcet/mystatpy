@@ -18,7 +18,7 @@ def MakeH5():
 def GetSeries():
     # Load the file 
     df = pandas.read_hdf("narrowed.h5", 'data')
-    # TODO now 
+    # TODO make three series, subtract values of malaysia and indonesia from world to make a fourth
     
 # Test confirms that MakeH5 worked by reading the data
 df = pandas.read_hdf("narrowed.h5", 'data')
