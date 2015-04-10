@@ -1,15 +1,19 @@
 import pandas, os
 
 def MakeH5():
-    # reading this huge csv file is slow, but this will get the data for the regions I need and save it as an hdf5 file
-    #
-    # 1) read the csv
+# reading this huge csv file is slow, but this will get the data for the regions I need and save it as an hdf5 file
+    
+    # read the csv
     raw_df = pandas.DataFrame.from_csv("E_production_crops_all.csv")
-    #
-    # 2) filter by country
-    narrowed = raw_df.loc[raw_df["Country"].isin(["Malaysia", "Indonesia", "World"])]
-    #
-    # 3) save to hdf5 and clear memory
+    
+    # add an index column
+    raw_df = raw_df.reset_index()
+    
+    # filter by country
+    country_list = ["Malaysia", "Indonesia", "World"]
+    narrowed = raw_df.loc[raw_df["Country"].isin(country_list)]
+    
+    # save to hdf5 and clear memory
     output = "narrowed.h5"
     narrowed.to_hdf(output, 'data', mode='w', format='fixed') 
     del raw_df
@@ -17,10 +21,10 @@ def MakeH5():
 # This one is not ready yet
 def GetSeries():
     # Load the file 
-    df = pandas.read_hdf("narrowed.h5", 'data')
-    # TODO make three series, subtract values of malaysia and indonesia from world to make a fourth
-    
+    raw_df = pandas.read_hdf("narrowed.h5",'data')
+    # TODO narrow again by item
+    # TODO create make the series
+    # TODO plot the series
+        
 # Test confirms that MakeH5 worked by reading the data
 df = pandas.read_hdf("narrowed.h5", 'data')
-print df.head   
-
