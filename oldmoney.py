@@ -11,7 +11,7 @@ Q_ = ureg.Quantity
 # ureg = UnitRegistry('/your/path/to/my_def.txt')
 ureg.define('pound_sterling = [money] = L') 
 ureg.define('shillings = L / 20 = d = s')
-ureg.define('pence = s/12 = d')
+ureg.define('pence = s/12 = p = n ')
 
 #  1908: the company produced over 80,000 lbs. of rubber, which sold at an average 4s. 3.75d
 price_1908 = (Q_(4, 's')) + (Q_(3.75, 'd'))
