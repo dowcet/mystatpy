@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Main routine asks user for a search string, then prints a list of FAOSTAT country and/or item codes for any matches.
 #
 # data is read from members.json, which can be downloaded directly at: 
@@ -5,6 +6,7 @@
 #
 # Search is case insensitive. The detailed "description" property is included in the search, so unexpected results are common.
 # 
+# TODO Take input as an argument
 
 import os, json, urllib
 
@@ -28,7 +30,7 @@ def QueryForProperties(code, prop_dict):
     # gets the properties for any member(s) matching the numerical code
     results_list = []
     for key in prop_dict:
-        if int(prop_dict[key]["bk"]) == int(search_string):
+        if int(prop_dict[key]["bk"]) == int(code):
             results_list.append(prop_dict[key])
     return results_list
 
