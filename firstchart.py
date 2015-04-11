@@ -1,136 +1,85 @@
-#!/usr/bin/env python
-#
-# MakeH5: reads a CSV, makes a smaller dataframe based on a query using .loc, and then writes an H5 file
-# GetSeries: loads the resulting file H5 file and gets the series to be plotted
-# PlotSeries: displays a plot of the series
-#
-# TODO see below
+#!/usr/bin/python 
+# 
+# TODO find or make a dictionary to look up Element from Element Code
 
-# Key variables defined at start of main routineInput variables
-
-import pandas, os
-from faocodes import GetDictionary, QueryForProperties
+import argparse 
+import os
+import pandas
+import matplotlib
 from matplotlib import pyplot
+import faocodes
+from faocodes import Code2Crop, Code2Country
 
-global prop_dict
+global input_CSV_filename
+global H5_filename
+global item_code_list
+global country_code_list
+ 
+input_CSV_filename = "E_production_crops_all.csv"
+H5_filename = "E_select_crops.h5"
+item_code_list = [254, 256, 257]
+country_code_list = [101, 131, 5000]
+item_to_plot = 254
+# this one is a string for now only because I don't have a dictionary 
+# for the codes yet
+element_to_plot = "Production" 
 
-def MakeH5(item_code_list):
-# reading this huge csv file is slow, but this will get the data for the regions I need and save it as an hdf5 file
-    print "Reading h5 file..." 
-    print 
-    # read the csv
-    csv_file_name = "E_production_crops_all.csv"
+# Reading a huge csv file is very slow. This will get the data for 
+# the regions I need, and save it as an hdf5 file. 
+#
+# 1) Read the CSV file, 2) Remove extra data, 3) Save the new file 
+def makeH5(item_code_list):
+    # 1)
     print "Reading from file", csv_file_name, "..."
-    raw_df = pandas.DataFrame.from_csv("E_production_crops_all.csv")
-    # add an index column
+    raw_df = pandas.DataFrame.from_csv(input_CSV_filename)
+    # This data doesn't have an index column, so add one
     raw_df = raw_df.reset_index()
-    #TODO write a dictionary to a json file based on "Country", "Item", "Element"
-    #TODO delete those columns (and also "Year Code") from the df
-    # Quick check of data
-    print raw_df.head(3)
-# Done reading data, now narrow it by Item Code
-    # TODO interactively choose item codes, etc.
+    # 2)
     print "Narrowing the data..."
+    # TODO should drop Element once we have a dictionary for it
+    # for now, get rid of other strings and extra data
+    raw_df.drop("Country", "Item", "Year Code")
+    # key step here, cuts most of the data out
     narrow_df = raw_df.loc[raw_df["Item Code"].isin(item_code_list)]
     del raw_df
-    print narrow_df.describe()
-
-    # save to hdf5 and clear memory
+    # 3) 
     output = "E_select_crops.h5"
     print "Saving to", output, "..."
     narrow_df.to_hdf(output, 'data', mode='w', format='fixed') 
     del narrow_df
 
-def PreviewColumns(df):
-    print "No. of Values Per Column"
-    print "-----------------------------"
-    results_list = []
-    for column in df:
-        temp_group = df.groupby(column)
-        column_list = []
-        column_list.append(column)
-        column_list.append(len(temp_group))
-        results_list.append(column_list)
-    for result_pair in results_list: 
-        print result_pair[0]+":", result_pair[1] 
-    print
+if __name__ == '__main__':
+    # I'm not actually sure I'll use arguments, but I'll leave them   
+    # here for now
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
 
-def GetCropLabel(bk_code):
-    # First get the property dictionary
-    prop_dict_list = QueryForProperties(str(bk_code), GetDictionary())
-    # get the label from the right dictionary (there may be two of them)
-    for dictionary in prop_dict_list:
-        if "description" in dictionary: # i.e. if item is a crop and not a country
-            crop_label = dictionary["label"]
-    return crop_label
+    # If it does not exist yet, make the H5 file automatically.
+    if not os.path.isfile(H5_filename):
+        makeH5(item_code_list)
+    # Read the H5 file.
+    df = pandas.read_hdf(H5_filename, 'data')
 
-def PreviewDataByItem(df, item_code_list):
-    print
-    print "Preview of Data by Item"
-    print "-----------------------------"
-    # Get the series for each items
-    for item_code in item_code_list:
-        temp_df = df.loc[df["Item Code"].isin([item_code])]
-        print
-        print "Item Code", item_code, "("+GetCropLabel(item_code)+")", "..."
-        print 
-        print temp_df.describe()
+    # Narrow the data down further to what we want to plot.
+    item_df = df.loc[df["Item Code"].isin([item_to_plot])]
+    element_item_df = item_df.loc[df["Element"].isin([element_to_plot])]
+ 
+    # Plot a series for each country
+    for country_code in country_code_list:
+        # Narrow the frame temporarily to just one country
+        country_frame = element_item_df.loc[df["Country Code"].isin([country_code])]
+        # Now we can index by year because there should only be one 
+        # row per year
+        country_frame = country_frame.set_index('Year')
+        # Make the value series
+        country_series = pandas.Series(country_frame["Value"])
+        # put it in the plot
+        pyplot.plot(country_series.index.values, country_series, marker = '.', label = Code2Country(country_code))
 
-#def GetSeries(df, item_code):
-    # TODO narrow again by item
-    # TODO create make the series
-    # TODO plot the series
-
-##### The following can be run as main routines ####
-
-item_code_list = [254, 256, 257] # 258 and 259 were empty 
-country_code_list = [101, 131, 5000] 
-
-# narrow and convert the data, only need to do this once
-# MakeH5(item_code_list)
-
-# Read the file saved by MakeH5()        
-df = pandas.read_hdf("E_select_crops.h5", 'data')
-
-# A preview of the data which is most useful with the very large dataset before creating the h5 
-#PreviewColumns(df)
-# A comparison to decide which series to plot
-#PreviewDataByItem(df, item_code_list)
-
-# based on the output of the above, code 254 is what we want
-oil_palm_df = df.loc[df["Item Code"].isin([254])]
-
-# i'm not sure which element I want, let's check
-for element in oil_palm_df.groupby("Element"):
-    print element[0]
-for element in oil_palm_df.groupby("Unit"):
-    print element[0]
-
-# "Production", I'm too lazy to get the code
-prod_oil_palm_df = oil_palm_df.loc[df["Element"].isin(["Production"])]
-#PreviewColumns(prod_oil_palm_df)
-
-# check that our only unit is "tonnes"
-for element in prod_oil_palm_df.groupby("Unit"):
-    print element[0]
-
-# make a country dict
-for country in prod_oil_palm_df.groupby("Country"):
-    print element[0]
-
-for country_code in country_code_list:
-    # narrow the frame temporarily to one country
-    country_frame = prod_oil_palm_df.loc[df["Country Code"].isin([country_code])]
-    # now we can index by year because there should only be one row per year
-    country_frame = country_frame.set_index('Year')
-    # make the series and check it
-    country_series = pandas.Series(country_frame["Value"])
-    PreviewColumns(country_series)
-    # and put it in the plot
-    pyplot.plot(country_series.index.values, country_series, marker = '.', label = country_code)
-
-pyplot.title("Palm Oil Production 1961-2014")
-pyplot.xlabel('Years')
-pyplot.ylabel('Metric Tonnes')
-pyplot.legend(loc='best')
-pyplot.show()
+    # Format and display the thing
+    pyplot.title("Palm Oil Production 1961-2013")
+    pyplot.xlabel('Years')
+    pyplot.ylabel('Metric Tonnes')
+    pyplot.legend(loc='best')
+    pyplot.show()
+    pyplot.savefig("firstchart.png")
