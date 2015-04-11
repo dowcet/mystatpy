@@ -6,16 +6,18 @@
 #
 # TODO see below
 
-# Input variables
-item_code_list = [254, 256, 257] # 258 and 259 were empty 
+# Key variables defined at start of main routineInput variables
 
 import pandas, os
 from faocodes import GetDictionary, QueryForProperties
+from matplotlib import pyplot
 
 global prop_dict
 
 def MakeH5(item_code_list):
 # reading this huge csv file is slow, but this will get the data for the regions I need and save it as an hdf5 file
+    print "Reading h5 file..." 
+    print 
     # read the csv
     csv_file_name = "E_production_crops_all.csv"
     print "Reading from file", csv_file_name, "..."
@@ -40,6 +42,8 @@ def MakeH5(item_code_list):
     del narrow_df
 
 def PreviewColumns(df):
+    print "No. of Values Per Column"
+    print "-----------------------------"
     results_list = []
     for column in df:
         temp_group = df.groupby(column)
@@ -49,6 +53,7 @@ def PreviewColumns(df):
         results_list.append(column_list)
     for result_pair in results_list: 
         print result_pair[0]+":", result_pair[1] 
+    print
 
 def GetCropLabel(bk_code):
     # First get the property dictionary
@@ -60,6 +65,9 @@ def GetCropLabel(bk_code):
     return crop_label
 
 def PreviewDataByItem(df, item_code_list):
+    print
+    print "Preview of Data by Item"
+    print "-----------------------------"
     # Get the series for each items
     for item_code in item_code_list:
         temp_df = df.loc[df["Item Code"].isin([item_code])]
@@ -73,26 +81,56 @@ def PreviewDataByItem(df, item_code_list):
     # TODO create make the series
     # TODO plot the series
 
-# The following can be run as main routines 
+##### The following can be run as main routines ####
+
+item_code_list = [254, 256, 257] # 258 and 259 were empty 
+country_code_list = [101, 131, 5000] 
 
 # narrow and convert the data, only need to do this once
 # MakeH5(item_code_list)
 
 # Read the file saved by MakeH5()        
-print "Reading h5 file..." 
-print 
 df = pandas.read_hdf("E_select_crops.h5", 'data')
 
 # A preview of the data which is most useful with the very large dataset before creating the h5 
-print "No. of Values Per Column"
-print "-----------------------------"
-PreviewColumns(df)
-
+#PreviewColumns(df)
 # A comparison to decide which series to plot
-print "Preview of Data by Item"
-print "-----------------------------"
-PreviewDataByItem(df, item_code_list)
+#PreviewDataByItem(df, item_code_list)
 
-# this will come next
-#for country in country_code_list:
-#    country_series = GetSeries(df, country)
+# based on the output of the above, code 254 is what we want
+oil_palm_df = df.loc[df["Item Code"].isin([254])]
+
+# i'm not sure which element I want, let's check
+for element in oil_palm_df.groupby("Element"):
+    print element[0]
+for element in oil_palm_df.groupby("Unit"):
+    print element[0]
+
+# "Production", I'm too lazy to get the code
+prod_oil_palm_df = oil_palm_df.loc[df["Element"].isin(["Production"])]
+#PreviewColumns(prod_oil_palm_df)
+
+# check that our only unit is "tonnes"
+for element in prod_oil_palm_df.groupby("Unit"):
+    print element[0]
+
+# make a country dict
+for country in prod_oil_palm_df.groupby("Country"):
+    print element[0]
+
+for country_code in country_code_list:
+    # narrow the frame temporarily to one country
+    country_frame = prod_oil_palm_df.loc[df["Country Code"].isin([country_code])]
+    # now we can index by year because there should only be one row per year
+    country_frame = country_frame.set_index('Year')
+    # make the series and check it
+    country_series = pandas.Series(country_frame["Value"])
+    PreviewColumns(country_series)
+    # and put it in the plot
+    pyplot.plot(country_series.index.values, country_series, marker = '.', label = country_code)
+
+pyplot.title("Palm Oil Production 1961-2014")
+pyplot.xlabel('Years')
+pyplot.ylabel('Metric Tonnes')
+pyplot.legend(loc='best')
+pyplot.show()
