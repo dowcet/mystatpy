@@ -23,7 +23,9 @@ sales_1910 = 320000 * (price_1910.to('L'))
 
 # they issued L22,500 of shares in 1903
 capital = (Q_(22500, 'L'))
-combined_sales = sales_1908 + sales_1910
-ratio = combined_sales / capital
 
-print "Combined sales from 1908 and 1910 were worth", str(combined_sales), "or about", str(ratio), "times the value of the shares issued in 1903."
+print "1908 sales :", sales_1908
+print "1910 sales :", sales_1910
+print "Total:", sales_1908 + sales_1910
+print
+print "~", str(((sales_1908 + sales_1910) / capital))[0], "times initial capital issue of", str(capital)+"."  
