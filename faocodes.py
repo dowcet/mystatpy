@@ -17,6 +17,7 @@ __location__ = os.path.realpath(
 
 def GetDictionary():
     # loads the main dictionary from members.json
+    # it contains a dictionary of property for every country and crop in FAOSTAT dataset "E"
     prop_dict = {}
     temp_list = []
     with open((os.path.join(__location__, "members.json")), 'r') as data_file:
@@ -25,6 +26,27 @@ def GetDictionary():
         prop_dict[item["label"]] = item["properties"]
         temp_list.append(item["properties"])
     return prop_dict
+
+def Code2Crop(bk_code):
+# Gets the crop label to match a crop code
+    # First get any property dictionary matching the code
+    prop_dict_list = QueryForProperties(str(bk_code), GetDictionary())
+    # if there is a dictionary for a crop, get the label 
+    for dictionary in prop_dict_list:
+        if "description" in dictionary: # i.e. if item is a crop and not a country
+            crop_label = dictionary["label"]
+    return crop_label
+
+def Code2Country(bk_code):
+# Gets the country label to match a country code
+    # First get any property dictionary matching the code
+    prop_dict_list = QueryForProperties(str(bk_code), GetDictionary())
+    # if there is a dictionary for a country, get the label 
+    for dictionary in prop_dict_list:
+        if not "description" in dictionary: # i.e. if item is not a crop, and therefore a country
+            country_label = dictionary["label"]
+    return country_label
+    
 
 def QueryForProperties(code, prop_dict):
     # gets the properties for any member(s) matching the numerical code
@@ -35,7 +57,7 @@ def QueryForProperties(code, prop_dict):
     return results_list
 
 def QueryForCodes(search_string, prop_dict):
-    # gets labels and codes from the dictionary based on a simple string search
+    # gets a list of codes and labels based on a search string 
     pair_list = [] 
     for key in prop_dict:
         label = prop_dict[key]["label"]
