@@ -28,14 +28,12 @@ global country_code_list
 global input_CSV_filename
 global H5_filename
  
-item_code_list = [254, 256, 257]                # 254 = "Oil, palm fruit", the others go in to the data file but not the chart
-country_code_list = [101, 131]            # 101 = Indon.; 131 = Malaysia
-input_CSV_filename = "E_production_crops_all.csv"
-H5_filename = "E_select_crops.h5"
+input_CSV_filename = "QC.csv"
+H5_filename = "QC_crops_selected.h5"
 
-# this one is a string for now only because I don't have a dictionary 
-# for the codes yet
-element_to_plot = "Production" 
+item_code_list = [254, 256, 257]                # 254 = "Oil, palm fruit", the others go in to the data file but not the chart
+country_code_list = [101, 131]            # 101 = Indonesia; 131 = Malaysia
+element_code_list = [5312]                      # 5312 = Production  
 
 # Reading a huge csv file is very slow. This will get the data for 
 # the regions I need, and save it as an hdf5 file. 
@@ -48,7 +46,6 @@ def make_H5(item_code_list):
     # This data doesn't have an index column, so add one
     raw_df = raw_df.reset_index()
     # 2)
-    print "Narrowing the data..."
     # TODO should drop Element once we have a dictionary for it
     # for now, get rid of other strings and extra data
     raw_df.drop("Country", "Item", "Year Code")
@@ -62,14 +59,21 @@ def make_H5(item_code_list):
     del narrow_df
 
 def make_df():
-    # Read the H5 file.
+    print "Reading the H5 file..."
     df = pandas.read_hdf(H5_filename, 'data')
-    # Narrow the data down further to what we want to plot.
+    print 
+    print df.describe()
+    print "Narrowing the data to", Code2Crop(item_code_list[0]) 
     item_df = df.loc[df["Item Code"].isin([item_code_list[0]])]
-    element_item_df = item_df.loc[df["Element"].isin([element_to_plot])]
+    print item_df.head()
+    print "Narrowing the data to element", element_code_list[0]
+    element_item_df = item_df.loc[df["Element Code"].isin(element_code_list)]
+    print element_item_df.head()
     return element_item_df
 
-def make_country_series(country, element_item_df):
+def make_country_series(country_code, element_item_df):
+    print "Plotting a series for", Code2Country(country_code)+"..."
+    print element_item_df.describe()
     # make a temporary frame with just one country
     country_frame = element_item_df.loc[element_item_df["Country Code"].isin([country_code])]
     # this is narrow enough that we can index by year 
@@ -79,6 +83,7 @@ def make_country_series(country, element_item_df):
     return country_series
 
 def make_plot():
+    image_file_name = "plot.png"
     # This part still needs to be automated
     pyplot.title("Palm Oil Production 1961-2013")
     pyplot.xlabel('Years')
@@ -90,8 +95,9 @@ def make_plot():
     ymax = 125
     pyplot.xlim(xmin, xmax)
     pyplot.ylim(ymin, ymax)
-    pyplot.show()
-    pyplot.savefig("firstchart.png")
+    #pyplot.show()
+    print "Saving output to", image_file_name+"!"
+    pyplot.savefig(image_file_name)
 
 if __name__ == '__main__':
     # 1) Haven't set up arguments yet
@@ -99,6 +105,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # 2) make the H5 file automatically if it does not already exist
     if not os.path.isfile(H5_filename):
+        print H5_filename, "not found..."
         make_H5(item_code_list)
     # 3) Get the data frame we want from the file
     element_item_df = make_df()
