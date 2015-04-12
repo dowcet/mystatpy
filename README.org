@@ -1,16 +1,19 @@
-A collection of Python tools for working with FAOSTAT and other data related to global development, economic history and agriculture.  
+A collection of Python tools for basic statistics related to global development, agriculture and economic history. The main focus for now is on [[http://faostat3.fao.org/][FAOSTAT]] production and trade data.   
 
-I am a novice learning as I go, so this is more like a personal sandbox then a reliable repository.
+I am a novice coder still learning as I go, so this is something of a personal sandbox. But I hope others will use and help improve on what's here. 
 * datapeek
-Functions for having a look at what's in a Pandas dataframe.
+Functions for having a look at what is in a Pandas dataframe, extending on `.describe()` and `.head()` 
 * faocodes 
-Looks up [[http://faostat3.fao.org/][FAOSTAT]] numerical codes for countries or commodities, and vice versa, via command line. It uses a `members.json` file downloaded from [[http://data.fao.org/developers/api/v1/en/resources/members.json?pageSize=1000&fields=mnemonic%2Clabel%40en%2Cproperties.*][this link]], and also works as a library. I eventually hope to use it to request data via API with Quandl.
-** TODO replace members.json with files from [[http://fenixapps.fao.org/repository/api/][the new API]]
-** TODO take arguments for advanced search and output options (just countries, etc.)  
-** TODO integrate with faoplot to generate plots
+Looks up FAO numerical codes for countries or commodities (including their descriptions), and vice versa. For now it uses a `members.json` file downloaded from [[http://data.fao.org/developers/api/v1/en/resources/members.json?pageSize=1000&fields=mnemonic%2Clabel%40en%2Cproperties.*][this link]]. I eventually hope to use it to request data via API with Quandl.
+** TODO
+*** replace members.json with files from [[http://fenixapps.fao.org/repository/api/][the newer API]] and add a function to update them
+*** improve command line output to give lists of countries and commodities sorted separately
+*** expand to other datasets / source
+*** integrate with faoplot to generate plots
 * faoplot 
-Will generate plots from FAOSTAT data, based on lists of items, element and country codes. The idea is to make multiple plots automatically, but it's not there yet. Uses `faocodes` as a library.
-** TODO make multiple plots
-** TODO improve output format
+Generate plots from FAOSTAT data, based on lists of items, element and country codes. The idea is to make multiple plots automatically, but it's not there yet. Uses `faocodes` as a library.
+** TODO 
+*** automatically set axis labels
+*** iterate through lists to make multiple plots
 * oldmoney
-Will use the [[https://github.com/hgrecco/pint][Pint]] library to work with data given in [[http://en.wikipedia.org/wiki/%C2%A3sd][pre-decimal British pounds]] (e.g. £2 3s 6d). 
+An example using the [[https://github.com/hgrecco/pint][Pint]] library to work with data given in [[http://en.wikipedia.org/wiki/%C2%A3sd][pre-decimal British pounds]] (e.g. £2 3s 6d). 
