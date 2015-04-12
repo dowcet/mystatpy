@@ -3,6 +3,8 @@ A collection of Python tools for working with FAOSTAT and other data related to 
 I am a novice learning as I go, so this is more like a personal sandbox then a reliable repository.
 * faocodes (beta)
 Looks up [[http://faostat3.fao.org/][FAOSTAT]] numerical codes for countries or commodities, and vice versa, via command line. It uses a `members.json` file downloaded from  [[http://data.fao.org/developers/api/v1/en/resources/members.json?pageSize=1000&fields=mnemonic%2Clabel%40en%2Cproperties.*][this link]], and also works as a library. I eventually hope to use it to request data via API with Quandl.
+* datapeek
+Functions for having a look at what's in a Pandas dataframe.
 * faoplot (very alpha)
 Will automatically generate plots from FAOSTAT data, based on lists of items, element and country codes. Uses `faocodes` as a library. 
 * oldmoney (pre-alpha)
