@@ -73,26 +73,25 @@ def make_df():
 
 def make_country_series(country_code, element_item_df):
     print "Plotting a series for", Code2Country(country_code)+"..."
-    print element_item_df.describe()
     # make a temporary frame with just one country
     country_frame = element_item_df.loc[element_item_df["Country Code"].isin([country_code])]
     # this is narrow enough that we can index by year 
     country_frame = country_frame.set_index('Year')
     # now make the series of values
-    country_series = pandas.Series(country_frame["Value"]/1000000)
+    country_series = pandas.Series(country_frame["Value"]/1000)
+    print country_series.head(3)
     return country_series
 
-def make_plot():
+def make_plot(ymax):
     image_file_name = "plot.png"
     # This part still needs to be automated
     pyplot.title("Palm Oil Production 1961-2013")
     pyplot.xlabel('Years')
-    pyplot.ylabel('Metric Tonnes (Millions)')
+    pyplot.ylabel('Metric Tonnes (thousands)')
     pyplot.legend(loc='best')
     xmin = 1960
-    xmax = 2014
+    xmax = 2015
     ymin = 0
-    ymax = 125
     pyplot.xlim(xmin, xmax)
     pyplot.ylim(ymin, ymax)
     #pyplot.show()
@@ -109,11 +108,18 @@ if __name__ == '__main__':
         make_H5(item_code_list)
     # 3) Get the data frame we want from the file
     element_item_df = make_df()
-    # 4) Get the series from the dataframe for each country and plot it
+    # 4) Get the series from the dataframe for each country and plot 
+    # it, keeping track of ymax along the way
+    ymax = 0
     for country_code in country_code_list:
         # get country series
         country_series = make_country_series(country_code, element_item_df)
         # add it to the plot
         pyplot.plot(country_series.index.values, country_series, marker = '.', label = Code2Country(country_code))
+        # increase ymax if needed
+        for value in country_series:
+            if value > ymax:
+                ymax = value + (value * .01)
+                print value, ymax
     # Format and display the thing
-    make_plot()
+    make_plot(ymax)
