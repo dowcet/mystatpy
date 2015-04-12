@@ -1,8 +1,9 @@
-* Overview
-A collection of simple Python functions for working with statistical data, especially related to the economic history of global agriculture. I am only just learning Python as I go, so this is partly a personal sandbox. 
-* Contents
-*faocodes.py*:  Gives [[http://faostat3.fao.org/][FAOSTAT]] numerical codes for countries or commodities, and vice versa. I eventually intend to use this to request data with Quandl.
+A collection of Python tools for working with FAOSTAT and other data related to global development, economic history and agriculture.  
 
-*firstchart.py*: A simple practice/demonstration using Pandas and PyPlot. It loads a huge FAOSTAT dataset into a smaller file, narrows the data further and plots a simple chart. 
-
-*oldmoney.py*: Uses the [[https://github.com/hgrecco/pint][Pint]] library to make sense of prices given in pre-decimal British pounds (i.e. with shillings and pence). 
+I am a novice learning as I go, so this is more like a personal sandbox then a reliable repository.
+* faocodes
+Looks up [[http://faostat3.fao.org/][FAOSTAT]] numerical codes for countries or commodities, and vice versa. I eventually intend to use this to request data via API with Quandl.
+* faoplot 
+Will automatically generate plots from FAOSTAT data, based on lists of items, element and country codes. 
+* oldmoney 
+Will use the [[https://github.com/hgrecco/pint][Pint]] library to work with data given in pre-decimal British pounds (£sd). 
