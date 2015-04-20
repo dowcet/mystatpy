@@ -108,7 +108,7 @@ if __name__ == '__main__':
     if not os.path.isfile(H5_filename):
         print H5_filename, "not found..."
         make_H5(item_code_list)
-    # 3) Get the data frame we want from the file
+    # 3) Get the data frame from the file, with only the element code(s) we want
     element_item_df = make_df()
     # 4) Get the series from the dataframe for each country and plot 
     # it, keeping track of ymax along the way
