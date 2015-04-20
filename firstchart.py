@@ -73,7 +73,7 @@ def make_df():
     return element_item_df
 
 def make_country_series(country_code, element_item_df):
-    print "Plotting a series for", Code2Country(country_code)+"..."
+    print "Creating a data series for", Code2Country(country_code)+"..."
     # make a temporary frame with just one country
     country_frame = element_item_df.loc[element_item_df["Country Code"].isin([country_code])]
     # this is narrow enough that we can index by year 
@@ -100,6 +100,16 @@ def make_plot(ymax):
     #print "Saving output to", image_file_name+"!"
     #pyplot.savefig(image_file_name)
 
+def get_line_dict(element_item_df):
+    series_dict = {}
+    for country_code in country_code_list:
+        # get country series, using country name as key - this will be a lot better when I make a Country class
+        series_dict[(Code2Country(country_code))] = make_country_series(country_code, element_item_df)
+    # make a line for "rest of world"
+    world_series = make_country_series(5000, element_item_df)
+    series_dict["Rest of World"] = world_series - (series_dict["Indonesia"] + series_dict["Malaysia"])
+    return series_dict
+
 if __name__ == '__main__':
     # 1) Haven't set up arguments yet
     parser = argparse.ArgumentParser()
@@ -110,18 +120,16 @@ if __name__ == '__main__':
         make_H5(item_code_list)
     # 3) Get the data frame from the file, with only the element code(s) we want
     element_item_df = make_df()
-    # 4) Get the series from the dataframe for each country and plot 
-    # it, keeping track of ymax along the way
+    # 4) make a dictionary, with each entry a line to plot
+    series_dict = get_line_dict(element_item_df)
+    # 5) plot each series in the dict 
+    # for now "key" is a country name, etc.
     ymax = 0
-    for country_code in country_code_list:
-        # get country series
-        country_series = make_country_series(country_code, element_item_df)
-        # add it to the plot
-        pyplot.plot(country_series.index.values, country_series, marker = '.', label = Code2Country(country_code))
+    for key in series_dict:
+        pyplot.plot(series_dict[key].index.values, series_dict[key], label = key)
         # increase ymax if needed
-        for value in country_series:
+        for value in series_dict[key]:
             if value > ymax:
                 ymax = value + (value * .01)
-                print value, ymax
     # Format and display the thing
     make_plot(ymax)
