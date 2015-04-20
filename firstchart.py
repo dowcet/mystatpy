@@ -19,8 +19,9 @@ import os
 import pandas
 import matplotlib
 from matplotlib import pyplot
-import faocodes
 from faocodes import Code2Crop, Code2Country
+import BW
+from BW import set_ax_lines_bw, set_fig_lines_bw
 
 global item_code_list
 global element_code_list
@@ -32,7 +33,7 @@ input_CSV_filename = "QC.csv"
 H5_filename = "QC_crops_selected.h5"
 
 item_code_list = [254, 256, 257]                # 254 = "Oil, palm fruit", the others go in to the data file but not the chart
-country_code_list = [101, 131]            # 101 = Indonesia; 131 = Malaysia
+country_code_list = [131, 101]            # 101 = Indonesia; 131 = Malaysia
 element_code_list = [5312]                      # 5312 = Production  
 
 # Reading a huge csv file is very slow. This will get the data for 
@@ -88,15 +89,16 @@ def make_plot(ymax):
     pyplot.title("Palm Oil Production 1961-2013")
     pyplot.xlabel('Years')
     pyplot.ylabel('Metric Tonnes (thousands)')
-    pyplot.legend(loc='best')
     xmin = 1960
     xmax = 2015
     ymin = 0
     pyplot.xlim(xmin, xmax)
     pyplot.ylim(ymin, ymax)
-    #pyplot.show()
-    print "Saving output to", image_file_name+"!"
-    pyplot.savefig(image_file_name)
+    set_fig_lines_bw(pyplot.gcf())
+    pyplot.legend(loc='best')
+    pyplot.show()
+    #print "Saving output to", image_file_name+"!"
+    #pyplot.savefig(image_file_name)
 
 if __name__ == '__main__':
     # 1) Haven't set up arguments yet
