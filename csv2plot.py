@@ -8,19 +8,23 @@ import pandas
 import matplotlib
 from matplotlib import pyplot
 
-def csv2plot(csv_filename):
-    df = pandas.DataFrame.from_csv(args.filename)
+def plot_csv(csv_filename):
+    pyplot.clf()
+    df = pandas.DataFrame.from_csv(csv_filename)
     for column in df:
         pyplot.plot(df[column].index.values, df[column], label=column)
     pyplot.xlabel(df.index.name)
-    pyplot.title(os.path.split(args.filename)[1])
+    pyplot.title(os.path.split(csv_filename)[1])
     pyplot.legend(loc='best')
     pyplot.show()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
     description='make a quick plot from a csv file')
-    parser.add_argument('filename', help='csv file to be plotted')
+    parser.add_argument('filename', nargs='?', help='csv file to be plotted')
     args = parser.parse_args()
-    csv_filename = args.filename
-    csv2plot(csv_filename)
+    if args.filename == None:
+        csv_filename = raw_input("Enter CSV filename: ")
+    else:
+        csv_filename = args.filename
+    plot_csv(csv_filename)
