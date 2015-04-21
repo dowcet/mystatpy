@@ -1,6 +1,8 @@
 A collection of Python tools for basic statistics related to global development, agriculture and economic history. The main focus for now is on [[http://faostat3.fao.org/][FAOSTAT]] production and trade data.   
 
 I am a novice coder still learning as I go, so this is something of a personal sandbox. But I hope others will use and help improve on what's here. 
+* csv2plot
+Takes the name of a csv file, opens a basic plot with a line for every column
 * datapeek
 Functions for having a look at what is in a Pandas dataframe, extending on `.describe()` and `.head()` 
 * faocodes 
